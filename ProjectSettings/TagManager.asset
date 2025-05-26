@@ -6,7 +6,9 @@ TagManager:
   tags:
   - Ignorar
   - llave
-  - codigosContenedor
+  - linterna
+  - nota1
+  - nota2
   layers:
   - Default
   - TransparentFX

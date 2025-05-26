@@ -7,7 +7,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: ocioabierto
+  m_Name: OcioAbierto
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -21,7 +21,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 7607c359c104c7f4f87c1a420fe4605b, type: 2}
+  m_Motion: {fileID: 7400000, guid: 5c0c839e6ddca0d4e953be35ff2962e9, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -136,6 +136,12 @@ AnimatorController:
     m_DefaultInt: 0
     m_DefaultBool: 0
     m_Controller: {fileID: 9100000}
+  - m_Name: OcioAbierto
+    m_Type: 4
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
   m_AnimatorLayers:
   - serializedVersion: 5
     m_Name: Base Layer
@@ -191,6 +197,9 @@ AnimatorStateTransition:
   - m_ConditionMode: 2
     m_ConditionEvent: Abierto
     m_EventTreshold: 0
+  - m_ConditionMode: 2
+    m_ConditionEvent: OcioAbierto
+    m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -238664957305732994}
   m_Solo: 0
@@ -215,6 +224,9 @@ AnimatorStateTransition:
   m_Conditions:
   - m_ConditionMode: 1
     m_ConditionEvent: Abierto
+    m_EventTreshold: 0
+  - m_ConditionMode: 1
+    m_ConditionEvent: OcioAbierto
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -4789137990764869289}
