@@ -24,43 +24,23 @@ public class Enemigo1 : MonoBehaviour
     public FirstPersonController datosJugador;
     public Flashazo visionJugador;
     public ElectricTorchOnOff linterna;
-    private Vector3 posicionInicial;
-
 
     void Start()
     {
         Anim = GetComponent<Animator>();
         Jugador = GameObject.Find("Jugador");
-        posicionInicial = transform.position;
     }
 
     void Update()
     {
-        /*if (!aturdido)
+        if (!aturdido)
         {
             ComportamientoEnemigo();
         }
         else
         {
             StartCoroutine(RecuperarseDelFlash());
-        }*/
-        Vector3 posicionActual = transform.position;
-
-            if (!aturdido)
-            {
-                ComportamientoEnemigo();
-            }
-            else
-            {
-                StartCoroutine(RecuperarseDelFlash());
-                if (posicionActual != posicionInicial)
-                {
-                    Anim.SetBool("Agonia", false);
-                    Anim.SetBool("Correr", true);
-                }
-            }
-        
-        posicionInicial = posicionActual;
+        }
     }
 
     public void ComportamientoEnemigo()
@@ -72,11 +52,6 @@ public class Enemigo1 : MonoBehaviour
             if (!Alerta)
             {
                 StartCoroutine(ActivarAlerta());
-            }
-            if (Microfono.ruidoTotal < SensibilidadSonido && Vector3.Distance(transform.position, Jugador.transform.position) <= DistMin && tiempoPersecucion >= TiempoMaxPersecucion)
-            {                
-                DejarDePerseguir();
-                Persiguiendo = false;
             }
         }
 
@@ -96,10 +71,11 @@ public class Enemigo1 : MonoBehaviour
                 Anim.SetBool("Correr", true);
                 Perseguir();
             }
-            if (Microfono.ruidoTotal < SensibilidadSonido && Vector3.Distance(transform.position, Jugador.transform.position) <= DistMin && tiempoPersecucion >= TiempoMaxPersecucion)
+
+            if (tiempoPersecucion >= TiempoMaxPersecucion)
             {
-                DejarDePerseguir();
                 Persiguiendo = false;
+                DejarDePerseguir();
             }
         }
         else
