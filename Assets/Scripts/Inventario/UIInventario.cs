@@ -11,10 +11,14 @@ public class UIInventario : MonoBehaviour
     private bool juegoPausado = false;
     public FirstPersonController jugador;
 
+    public GameObject PanelNotas;
+    public GameObject PanelObjetos;
+
 
     private void Start()
     {
         panelInventario.SetActive(false);
+        PanelObjetos.SetActive(true);
         
     }
 
@@ -56,5 +60,16 @@ public class UIInventario : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = false;
+    }
+
+    public void ActivarPanelNotas()
+    {
+        PanelNotas.SetActive(true);
+        PanelObjetos.SetActive(false);
+    }
+    public void ActivarPanelObjetos()
+    {
+        PanelNotas.SetActive(false);
+        PanelObjetos.SetActive(true);
     }
 }

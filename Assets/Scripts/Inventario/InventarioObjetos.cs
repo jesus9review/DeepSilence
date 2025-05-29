@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class InventarioObjetos : MonoBehaviour
 {
@@ -12,6 +13,8 @@ public class InventarioObjetos : MonoBehaviour
 
     private Transform panelObjetos;
     private Transform panelNotas;
+
+    public TextMeshProUGUI textoObjetos;
 
     //IconosObjetos
     public GameObject objetoInventario;
@@ -24,10 +27,23 @@ public class InventarioObjetos : MonoBehaviour
     }
 
     // Start is called before the first frame update
-    void Start()
+    void OnEnable()
     {
+
         objetosDisponibles = contenedorInventario.GetComponent<NombresObjetos>();
         objetosObtenidos = contenedorInventario.GetComponent<BaseDeDatosJugador>();
+
+        
+        for (int i = panelObjetos.childCount - 1; i >= 0; i--)
+        {
+            GameObject.Destroy(panelObjetos.GetChild(i).gameObject);
+        }
+
+        for (int i = panelNotas.childCount - 1; i >= 0; i--)
+        {
+            GameObject.Destroy(panelNotas.GetChild(i).gameObject);
+        }
+
 
         //Notas
         for (int i = 0; i < objetosDisponibles.ItemsString.Length; i++)
@@ -55,7 +71,11 @@ public class InventarioObjetos : MonoBehaviour
                         icono = Resources.Load<Sprite>("IconosInventario/" + item);
                     }
 
-                    objeto.GetComponent<Image>().sprite = icono;
+                    string itemDescripcion = objetosDisponibles.ItemsDescripcion[j];
+
+                    objeto.transform.GetChild(0).GetComponent<Image>().sprite = icono;
+                    objeto.transform.GetComponent<InfoObjeto>().info = itemDescripcion;
+                    
 
                     break;
                 }
@@ -85,9 +105,4 @@ public class InventarioObjetos : MonoBehaviour
          }*/
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 }
