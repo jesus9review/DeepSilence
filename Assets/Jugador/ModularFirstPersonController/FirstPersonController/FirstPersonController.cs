@@ -5,8 +5,14 @@ using UnityEngine.UI;
 
 public class FirstPersonController : MonoBehaviour
 {
+    [SerializeField] private Transform flashlightTransform; // Asigna esto en el Inspector
+    [SerializeField] private Vector3 flashlightBobAmount = new Vector3(0.02f, 0.02f, 0f);
+    [SerializeField] private float flashlightBobSpeed = 6f;
+
+    private Vector3 flashlightOriginalPos;
+    private float flashlightBobTimer = 0f;
+
     private Rigidbody rb;
-    
     public AudioSource pasosAudioSource;
     public AudioSource respiracionAudioSource;
     public AudioClip caminarClip;
@@ -15,9 +21,8 @@ public class FirstPersonController : MonoBehaviour
     public AudioClip respiracionCalmadaNormal;
     public AudioClip respiracionAceleradaSprint;
     public AudioClip respiracionAceleradaCooldown;
-    [SerializeField] private Transform cameraHolder;
-    [SerializeField] private Vector3 standingCamPos = new Vector3(0f, 0.9f, 0f);
-    [SerializeField] private Vector3 crouchingCamPos = new Vector3(0f, 0.5f, 0f);
+    private Vector3 standingCamPos = new Vector3(0f, 1.2f, 0f);
+    private Vector3 crouchingCamPos = new Vector3(0f, 0.2f, 0f);
     [SerializeField] private float crouchTransitionSpeed = 6f;
 
     #region Camera Movement Variables
@@ -150,16 +155,19 @@ public class FirstPersonController : MonoBehaviour
             sprintRemaining = sprintDuration;
             sprintCooldownReset = sprintCooldown;
         }
+
+        flashlightOriginalPos = flashlightTransform.localPosition;
+
     }
 
     void Start()
     {
-        if(lockCursor)
+        if (lockCursor)
         {
             Cursor.lockState = CursorLockMode.Locked;
         }
 
-        if(crosshair)
+        if (crosshair)
         {
             crosshairObject.sprite = crosshairImage;
             crosshairObject.color = crosshairColor;
@@ -173,7 +181,7 @@ public class FirstPersonController : MonoBehaviour
 
         sprintBarCG = GetComponentInChildren<CanvasGroup>();
 
-        if(useSprintBar)
+        if (useSprintBar)
         {
             sprintBarBG.gameObject.SetActive(true);
             sprintBar.gameObject.SetActive(true);
@@ -187,7 +195,7 @@ public class FirstPersonController : MonoBehaviour
             sprintBarBG.rectTransform.sizeDelta = new Vector3(sprintBarWidth, sprintBarHeight, 0f);
             sprintBar.rectTransform.sizeDelta = new Vector3(sprintBarWidth - 2, sprintBarHeight - 2, 0f);
 
-            if(hideBarWhenFull)
+            if (hideBarWhenFull)
             {
                 sprintBarCG.alpha = 0;
             }
@@ -210,7 +218,7 @@ public class FirstPersonController : MonoBehaviour
         #region Camera
 
         // Control camera movement
-        if(cameraCanMove)
+        if (cameraCanMove)
         {
             yaw = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * mouseSensitivity;
 
@@ -229,6 +237,7 @@ public class FirstPersonController : MonoBehaviour
 
             transform.localEulerAngles = new Vector3(0, yaw, 0);
             playerCamera.transform.localEulerAngles = new Vector3(pitch, 0, 0);
+            FlashlightBob();
         }
 
         #region Camera Zoom
@@ -237,7 +246,7 @@ public class FirstPersonController : MonoBehaviour
         {
             // Changes isZoomed when key is pressed
             // Behavior for toogle zoom
-            if(Input.GetKeyDown(zoomKey) && !holdToZoom && !isSprinting)
+            if (Input.GetKeyDown(zoomKey) && !holdToZoom && !isSprinting)
             {
                 if (!isZoomed)
                 {
@@ -251,24 +260,24 @@ public class FirstPersonController : MonoBehaviour
 
             // Changes isZoomed when key is pressed
             // Behavior for hold to zoom
-            if(holdToZoom && !isSprinting)
+            if (holdToZoom && !isSprinting)
             {
-                if(Input.GetKeyDown(zoomKey))
+                if (Input.GetKeyDown(zoomKey))
                 {
                     isZoomed = true;
                 }
-                else if(Input.GetKeyUp(zoomKey))
+                else if (Input.GetKeyUp(zoomKey))
                 {
                     isZoomed = false;
                 }
             }
 
             // Lerps camera.fieldOfView to allow for a smooth transistion
-            if(isZoomed)
+            if (isZoomed)
             {
                 playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, zoomFOV, zoomStepTime * Time.deltaTime);
             }
-            else if(!isZoomed && !isSprinting)
+            else if (!isZoomed && !isSprinting)
             {
                 playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, fov, zoomStepTime * Time.deltaTime);
             }
@@ -281,18 +290,18 @@ public class FirstPersonController : MonoBehaviour
 
         if (enableSprint)
         {
-            if (isSprinting)
+            if (isSprinting && !isCrouched)
             {
                 isZoomed = false;
                 playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, sprintFOV, sprintFOVStepTime * Time.deltaTime);
 
                 if (!unlimitedSprint)
                 {
-                    sprintRemaining -= 1 * Time.deltaTime;
-                    if (sprintRemaining <= 0)
+                    sprintRemaining -= Time.deltaTime;
+                    sprintRemaining = Mathf.Clamp(sprintRemaining, 0f, sprintDuration);
+                    if (sprintRemaining <= 0f)
                     {
                         isSprinting = false;
-                        isSprintCooldown = true;
                     }
                 }
             }
@@ -397,7 +406,7 @@ public class FirstPersonController : MonoBehaviour
             }
             else
             {
-                if (Input.GetKeyDown(crouchKey))
+                if (Input.GetKeyDown(crouchKey)&& isSprinting==false)
                 {
                     isCrouched = true;
                     ApplyCrouchState();
@@ -409,19 +418,13 @@ public class FirstPersonController : MonoBehaviour
                 }
             }
         }
-
-        // Transición suave de la cámara
         Vector3 targetPos = isCrouched ? crouchingCamPos : standingCamPos;
-        cameraHolder.localPosition = Vector3.Lerp(cameraHolder.localPosition, targetPos, Time.deltaTime * crouchTransitionSpeed);
-
-
-
-
+        joint.localPosition = Vector3.Lerp(joint.localPosition, targetPos, Time.deltaTime * crouchTransitionSpeed);
         #endregion
 
         CheckGround();
 
-        if(enableHeadBob)
+        if (enableHeadBob)
         {
             HeadBob();
         }
@@ -448,7 +451,7 @@ public class FirstPersonController : MonoBehaviour
             }
 
             // All movement calculations shile sprint is active
-            if (enableSprint && Input.GetKey(sprintKey) && sprintRemaining > 0f && !isSprintCooldown)
+            if (enableSprint && Input.GetKey(sprintKey) && sprintRemaining > 0f && isCrouched == false)
             {
                 targetVelocity = transform.TransformDirection(targetVelocity) * sprintSpeed;
 
@@ -464,12 +467,6 @@ public class FirstPersonController : MonoBehaviour
                 if (velocityChange.x != 0 || velocityChange.z != 0)
                 {
                     isSprinting = true;
-
-                    if (isCrouched)
-                    {
-                        ApplyCrouchState();
-                    }
-
                     if (hideBarWhenFull && !unlimitedSprint)
                     {
                         sprintBarCG.alpha += 5 * Time.deltaTime;
@@ -533,7 +530,7 @@ public class FirstPersonController : MonoBehaviour
         }
 
         // When crouched and using toggle system, will uncrouch for a jump
-        if(isCrouched && !holdToCrouch)
+        if (isCrouched && !holdToCrouch)
         {
             ApplyCrouchState();
         }
@@ -547,43 +544,91 @@ public class FirstPersonController : MonoBehaviour
 
     private void ApplyCrouchState()
     {
+        isSprinting = false;
         walkSpeed = isCrouched ? crouchSpeed : normalSpeed;
     }
 
+    private Vector3 currentBasePos;
 
     private void HeadBob()
     {
+        // Determina la posición objetivo según si está agachado o no
+        Vector3 targetPos = isCrouched ? crouchingCamPos : standingCamPos;
+
+        // Interpola suavemente hacia esa posición con la variable que tú definiste
+        currentBasePos = Vector3.Lerp(currentBasePos, targetPos, Time.deltaTime * crouchTransitionSpeed);
+
         if (isWalking)
         {
-            // Aumenta el timer con velocidad según el estado del jugador
+            // Aumenta el timer según el estado
             if (isSprinting)
             {
                 timer += Time.deltaTime * (bobSpeed + sprintSpeed);
             }
             else if (isCrouched)
             {
-                timer += Time.deltaTime * (bobSpeed * 0.5f); // Se reduce más en crouch
+                timer += Time.deltaTime * (bobSpeed * 0.5f);
             }
             else
             {
                 timer += Time.deltaTime * bobSpeed;
             }
 
-            // Movimiento del bob aplicado al joint
+            // Movimiento bob
             Vector3 bobOffset = new Vector3(
                 Mathf.Sin(timer) * bobAmount.x,
                 Mathf.Sin(timer * 2) * bobAmount.y,
                 Mathf.Sin(timer) * bobAmount.z
             );
 
-            joint.localPosition = jointOriginalPos + bobOffset;
+            // Suma el head bob a la posición interpolada
+            joint.localPosition = currentBasePos + bobOffset;
         }
         else
         {
-            // Reset y regreso suave al punto original si no hay movimiento
+            // Cuando no camina, regresa suavemente a la posición base (sin bob)
             timer = 0;
-            joint.localPosition = Vector3.Lerp(joint.localPosition, jointOriginalPos, Time.deltaTime * bobSpeed);
+            joint.localPosition = Vector3.Lerp(joint.localPosition, currentBasePos, Time.deltaTime * crouchTransitionSpeed);
         }
     }
+    private void FlashlightBob()
+    {
+        if (isWalking)
+        {
+            float currentSpeed = flashlightBobSpeed;
+
+            if (isSprinting)
+            {
+                currentSpeed += 2f;
+            }
+            else if (isCrouched)
+            {
+                currentSpeed *= 0.5f;
+            }
+
+            flashlightBobTimer += Time.deltaTime * currentSpeed;
+
+            Vector3 bobOffset = new Vector3(
+                Mathf.Sin(flashlightBobTimer) * flashlightBobAmount.x,
+                Mathf.Cos(flashlightBobTimer * 2) * flashlightBobAmount.y,
+                0
+            );
+
+            flashlightTransform.localPosition = flashlightOriginalPos + bobOffset;
+        }
+        else
+        {
+            flashlightBobTimer = 0f;
+            flashlightTransform.localPosition = Vector3.Lerp(
+                flashlightTransform.localPosition,
+                flashlightOriginalPos,
+                Time.deltaTime * flashlightBobSpeed
+            );
+        }
+    }
+
+
+
+
 
 }

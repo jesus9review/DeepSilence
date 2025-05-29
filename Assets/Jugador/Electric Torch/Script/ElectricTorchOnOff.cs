@@ -33,9 +33,12 @@ public class ElectricTorchOnOff : MonoBehaviour
 	public float intensityLight = 2.5F;
 	public bool _flashLightOn = false;
 	[SerializeField] float _lightTime = 0.05f;
+    [SerializeField] AudioSource FlashlightSounds;
+    [SerializeField] AudioClip onSound;
+    [SerializeField] AudioClip offSound;
 
 
-	private void Awake()
+    private void Awake()
     {
 		_batteryPower = FindObjectOfType<BatteryPowerPickup>();
 	}
@@ -80,11 +83,15 @@ public class ElectricTorchOnOff : MonoBehaviour
             if (Input.GetKeyDown(_kCode) && _flashLightOn == false)
             {
                 _flashLightOn = true;
+				FlashlightSounds.clip = onSound;
+				FlashlightSounds.Play();
 
             }
             if (Input.GetKeyUp(_kCode) && _flashLightOn == true)
             {
                 _flashLightOn = false;
+               /* FlashlightSounds.clip = offSound;
+                FlashlightSounds.Play();*/
 
             }
 		}
