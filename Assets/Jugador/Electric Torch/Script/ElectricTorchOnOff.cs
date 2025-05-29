@@ -80,6 +80,15 @@ public class ElectricTorchOnOff : MonoBehaviour
             if (Input.GetKeyDown(_kCode) && _flashLightOn == false)
             {
                 _flashLightOn = true;
+<<<<<<< Updated upstream
+=======
+				FlashlightSounds.clip = onSound;
+				FlashlightSounds.Play();
+				if(intensityLight == 0)
+				{
+                    _flashLightOn = false;
+                }
+>>>>>>> Stashed changes
 
             }
             if (Input.GetKeyUp(_kCode) && _flashLightOn == true)
@@ -93,6 +102,10 @@ public class ElectricTorchOnOff : MonoBehaviour
             if (Input.GetKeyDown(_kCode) && _flashLightOn == false)
             {
                 _flashLightOn = true;
+                if (intensityLight == 0)
+                {
+                    _flashLightOn = false;
+                }
 
             }
             if (Input.GetKeyDown(_kCode) && _flashLightOn == true)
