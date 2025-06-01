@@ -82,16 +82,22 @@ public class ElectricTorchOnOff : MonoBehaviour
 		{
             if (Input.GetKeyDown(_kCode) && _flashLightOn == false)
             {
-                _flashLightOn = true;
 				FlashlightSounds.clip = onSound;
 				FlashlightSounds.Play();
+				if(intensityLight == 0)
+				{
+                    _flashLightOn = false;
+                } else
+				{
+                    _flashLightOn = true;
+                }
 
             }
             if (Input.GetKeyUp(_kCode) && _flashLightOn == true)
             {
                 _flashLightOn = false;
-               /* FlashlightSounds.clip = offSound;
-                FlashlightSounds.Play();*/
+               FlashlightSounds.clip = offSound;
+                FlashlightSounds.Play();
 
             }
 		}
@@ -99,7 +105,14 @@ public class ElectricTorchOnOff : MonoBehaviour
 		{
             if (Input.GetKeyDown(_kCode) && _flashLightOn == false)
             {
-                _flashLightOn = true;
+                if (intensityLight == 0)
+                {
+                    _flashLightOn = false;
+                }
+                else
+                {
+                    _flashLightOn = true;
+                }
 
             }
             if (Input.GetKeyDown(_kCode) && _flashLightOn == true)

@@ -24,15 +24,28 @@ public class Enemigo1 : MonoBehaviour
     public FirstPersonController datosJugador;
     public Flashazo visionJugador;
     public ElectricTorchOnOff linterna;
+    private Vector3 posicionInicial;
+
 
     void Start()
     {
         Anim = GetComponent<Animator>();
         Jugador = GameObject.Find("Jugador");
+        posicionInicial = transform.position;
     }
 
     void Update()
     {
+        /*if (!aturdido)
+        {
+            ComportamientoEnemigo();
+        }
+        else
+        {
+            StartCoroutine(RecuperarseDelFlash());
+        }*/
+        Vector3 posicionActual = transform.position;
+
         if (!aturdido)
         {
             ComportamientoEnemigo();
@@ -40,7 +53,14 @@ public class Enemigo1 : MonoBehaviour
         else
         {
             StartCoroutine(RecuperarseDelFlash());
+            if (posicionActual != posicionInicial)
+            {
+                Anim.SetBool("Agonia", false);
+                Anim.SetBool("Correr", true);
+            }
         }
+
+        posicionInicial = posicionActual;
     }
 
     public void ComportamientoEnemigo()
@@ -52,6 +72,11 @@ public class Enemigo1 : MonoBehaviour
             if (!Alerta)
             {
                 StartCoroutine(ActivarAlerta());
+            }
+            if (Microfono.ruidoTotal < SensibilidadSonido && Vector3.Distance(transform.position, Jugador.transform.position) <= DistMin && tiempoPersecucion >= TiempoMaxPersecucion)
+            {
+                DejarDePerseguir();
+                Persiguiendo = false;
             }
         }
 
@@ -71,11 +96,10 @@ public class Enemigo1 : MonoBehaviour
                 Anim.SetBool("Correr", true);
                 Perseguir();
             }
-
-            if (tiempoPersecucion >= TiempoMaxPersecucion)
+            if (Microfono.ruidoTotal < SensibilidadSonido && Vector3.Distance(transform.position, Jugador.transform.position) <= DistMin && tiempoPersecucion >= TiempoMaxPersecucion)
             {
-                Persiguiendo = false;
                 DejarDePerseguir();
+                Persiguiendo = false;
             }
         }
         else
@@ -138,12 +162,12 @@ public class Enemigo1 : MonoBehaviour
 
     public void RecibirFlash()
     {
-            aturdido = true;
-            Persiguiendo = false;
-            IA.ResetPath();
-            Anim.SetTrigger("Flashazo");
-            Anim.SetBool("Alerta", true);
-            Anim.SetBool("Correr", false);
+        aturdido = true;
+        Persiguiendo = false;
+        IA.ResetPath();
+        Anim.SetTrigger("Flashazo");
+        Anim.SetBool("Alerta", true);
+        Anim.SetBool("Correr", false);
     }
 
     private IEnumerator RecuperarseDelFlash()
@@ -154,7 +178,7 @@ public class Enemigo1 : MonoBehaviour
 
         if (Vector3.Distance(transform.position, Jugador.transform.position) <= DistMin)
         {
-                StartCoroutine(ActivarAlerta());
+            StartCoroutine(ActivarAlerta());
         }
     }
 }

@@ -421,8 +421,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32c541f117d57c242a934f29588b1c35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sensibilidad: 2
-  ruidoCorrer: 0.3
+  sensibilidad: 5
+  ruidoCorrer: 0.7
   ruidoCaminar: 0.2
   ruidoAgachado: -0.1
   ruidoTotal: 0
