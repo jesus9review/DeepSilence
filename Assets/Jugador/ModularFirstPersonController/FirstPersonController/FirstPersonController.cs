@@ -21,8 +21,8 @@ public class FirstPersonController : MonoBehaviour
     public AudioClip respiracionCalmadaNormal;
     public AudioClip respiracionAceleradaSprint;
     public AudioClip respiracionAceleradaCooldown;
-    private Vector3 standingCamPos = new Vector3(0f, 1.2f, 0f);
-    private Vector3 crouchingCamPos = new Vector3(0f, 0.2f, 0f);
+    [SerializeField] private Vector3 standingCamPos = new Vector3(0f, 1.2f, 0f);
+    [SerializeField] private Vector3 crouchingCamPos = new Vector3(0f, 0.2f, 0f);
     [SerializeField] private float crouchTransitionSpeed = 6f;
 
     #region Camera Movement Variables
