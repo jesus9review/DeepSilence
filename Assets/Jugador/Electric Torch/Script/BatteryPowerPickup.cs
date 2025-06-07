@@ -1,30 +1,20 @@
-﻿// - BatteryPowerPickup - Script by Marcelli Michele
-// Attach this script on a GameObject (battery pickup) with collider component
-
-
-using UnityEngine;
+﻿using UnityEngine;
 
 public class BatteryPowerPickup : MonoBehaviour
 {
-    ElectricTorchOnOff _torchOnOff;
-    //
     public float PowerIntensityLight;
+    private ElectricTorchOnOff _torchOnOff;
 
-    private void Awake()
+    private void Start()
     {
         _torchOnOff = FindObjectOfType<ElectricTorchOnOff>();
     }
-    void OnTriggerEnter(Collider other)
-    {
-        if (other)
-        {
-            _torchOnOff._PowerPickUp = true;
-            _torchOnOff.intensityLight = PowerIntensityLight;
-        }
-    }
 
-    private void OnTriggerExit(Collider other)
+    public void PickUp(ElectricTorchOnOff torch)
     {
+        torch._PowerPickUp = true;
+        torch.intensityLight = PowerIntensityLight;
         _torchOnOff._PowerPickUp = false;
+        Destroy(gameObject);
     }
 }

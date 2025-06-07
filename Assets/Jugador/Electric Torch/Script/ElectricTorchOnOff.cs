@@ -28,7 +28,7 @@ public class ElectricTorchOnOff : MonoBehaviour
 	private KeyCode _kCode;
 	[Space]
 	[Space]
-	public bool _PowerPickUp = false;
+	public bool _PowerPickUp = true;
 	[Space]
 	public float intensityLight = 2.5F;
 	public bool _flashLightOn = false;
